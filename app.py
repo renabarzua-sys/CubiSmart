@@ -33,7 +33,7 @@ st.markdown("""
     padding: 2rem 3rem 4rem;
 }
 
-/* TITULOS */
+/* TITULOS GENERALES */
 h1, h2, h3, h4 {
     color: #163B39 !important;
     letter-spacing: -0.5px;
@@ -112,12 +112,12 @@ h1, h2, h3, h4 {
     font-weight: 750;
 }
 
-/* CUADROS DE FORMULARIO */
+/* TARJETAS DE FORMULARIO */
 div[data-testid="stVerticalBlockBorderWrapper"] {
     border-radius: 20px;
 }
 
-/* ETIQUETAS SOBRE LAS MEDIDAS */
+/* ETIQUETAS DE LAS MEDIDAS */
 [data-testid="stNumberInput"] label,
 [data-testid="stNumberInput"] label *,
 [data-testid="stWidgetLabel"],
@@ -128,32 +128,78 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
     font-weight: 700 !important;
 }
 
-/* CASILLAS NUMERICAS */
+/* ======================================
+   NUEVO DISEÑO DE CASILLAS NUMERICAS
+   ====================================== */
+
+/* CONTENEDOR EXTERIOR */
+[data-testid="stNumberInput"] div[data-baseweb="input"] {
+    background-color: #FFFFFF !important;
+    border: 1px solid #B8DDD0 !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+/* ELEMENTO INTERIOR DEL CAMPO */
+[data-testid="stNumberInput"] div[data-baseweb="base-input"] {
+    background-color: #FFFFFF !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* AL SELECCIONAR LA CASILLA */
+[data-testid="stNumberInput"] div[data-baseweb="input"]:focus-within {
+    border-color: #127566 !important;
+    box-shadow: 0 0 0 2px rgba(18,117,102,0.12) !important;
+}
+
+/* QUITAR CONTORNO NEGRO INTERNO */
 [data-testid="stNumberInput"] input {
     color: #173D37 !important;
     -webkit-text-fill-color: #173D37 !important;
     background-color: #FFFFFF !important;
-    border-radius: 10px;
-    font-weight: 600;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    font-weight: 600 !important;
 }
 
-/* BOTONES DE MENOS Y MAS */
+/* MANTENER EL FOCO SIN BORDE NEGRO */
+[data-testid="stNumberInput"] input:focus {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* BOTONES MENOS Y MAS */
 [data-testid="stNumberInput"] button {
     background-color: #DDF3EB !important;
     color: #173D37 !important;
-    border-color: #B8DDD0 !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
+/* ICONOS MENOS Y MAS */
 [data-testid="stNumberInput"] button svg {
     color: #173D37 !important;
     stroke: #173D37 !important;
 }
 
+/* EFECTO AL PASAR EL CURSOR */
 [data-testid="stNumberInput"] button:hover {
     background-color: #BDE5D7 !important;
 }
 
-/* TEXTOS DEBAJO DE LAS CASILLAS */
+[data-testid="stNumberInput"] button:hover svg {
+    color: #0D6255 !important;
+    stroke: #0D6255 !important;
+}
+
+/* ======================================
+   TEXTOS DE AYUDA
+   ====================================== */
+
 [data-testid="stCaptionContainer"],
 [data-testid="stCaptionContainer"] p,
 [data-testid="stCaptionContainer"] span {
@@ -168,7 +214,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
     line-height: 1.6;
 }
 
-/* BOTON PRINCIPAL */
+/* BOTON CALCULAR */
 .stButton > button[kind="primary"] {
     background: linear-gradient(115deg, #127566, #20A38B);
     color: #FFFFFF !important;
@@ -183,6 +229,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
 
 .stButton > button[kind="primary"]:hover {
     background: linear-gradient(115deg, #0D6255, #188E79);
+    color: #FFFFFF !important;
     transform: translateY(-2px);
 }
 
@@ -204,7 +251,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
     box-shadow: 0 7px 22px rgba(22,73,59,0.07);
 }
 
-/* NOMBRES DE LOS RESULTADOS */
+/* TITULOS DE LOS RESULTADOS */
 [data-testid="stMetricLabel"],
 [data-testid="stMetricLabel"] * {
     color: #173D37 !important;
@@ -213,7 +260,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
     font-weight: 700 !important;
 }
 
-/* NUMEROS DE LOS RESULTADOS */
+/* VALORES DE LOS RESULTADOS */
 [data-testid="stMetricValue"],
 [data-testid="stMetricValue"] * {
     color: #127566 !important;
@@ -288,7 +335,7 @@ st.markdown("""
 
 
 # ==========================================
-# 5. FUNCION PARA TITULOS
+# 5. TITULOS DE SECCIONES
 # ==========================================
 
 def titulo_seccion(numero, nombre):
@@ -541,11 +588,15 @@ if calcular:
             st.error(f"Debes ingresar: {nombre}.")
             st.stop()
 
+    # VALIDAR DIMENSIONES DEL MURO
+
     if largo <= 0 or alto <= 0:
         st.error(
             "Las dimensiones del muro deben ser mayores que cero."
         )
         st.stop()
+
+    # VALIDAR DIMENSIONES DEL LADRILLO
 
     if (
         largo_ladrillo <= 0
@@ -557,7 +608,7 @@ if calcular:
         )
         st.stop()
 
-    # CALCULAR VANOS
+    # CALCULAR SUPERFICIE DE LOS VANOS
 
     superficie_total_vanos = 0.0
     superficies_individuales = []
@@ -589,7 +640,7 @@ if calcular:
         superficie_total_vanos += superficie_vano
         superficies_individuales.append(superficie_vano)
 
-    # SUPERFICIE DEL MURO
+    # CALCULAR SUPERFICIE NETA
 
     superficie = largo * alto
     superficie_neta = superficie - superficie_total_vanos
@@ -601,19 +652,19 @@ if calcular:
         )
         st.stop()
 
-    # VOLUMEN DEL MURO
+    # CALCULAR VOLUMEN DEL MURO
 
     espesor = ancho_ladrillo
     volumen = superficie_neta * espesor
 
-    # SUPERFICIE MODULAR DEL LADRILLO
+    # CALCULAR SUPERFICIE MODULAR
 
     largo_modular = largo_ladrillo + junta_mortero
     alto_modular = alto_ladrillo + junta_mortero
 
     superficie_modular = largo_modular * alto_modular
 
-    # CANTIDAD DE LADRILLOS
+    # CALCULAR CANTIDAD DE LADRILLOS
 
     cantidad_ladrillos = superficie_neta / superficie_modular
 
@@ -629,7 +680,7 @@ if calcular:
         round(cantidad_con_perdida, 9)
     )
 
-    # MORTERO DE PEGA
+    # CALCULAR MORTERO DE PEGA
 
     volumen_ladrillo = (
         largo_ladrillo * alto_ladrillo * ancho_ladrillo
@@ -666,12 +717,13 @@ if calcular:
 
 
 # ==========================================
-# 13. RESULTADOS SIEMPRE VISIBLES
+# 13. RESULTADOS
 # ==========================================
 
 r = st.session_state.resultados
 
 st.divider()
+
 st.markdown("## 📊 Resultados de cubicación")
 
 
@@ -691,47 +743,77 @@ def mostrar_resultado(nombre, clave, decimales=2, unidad=""):
     st.metric(nombre, valor)
 
 
-# RESULTADOS DEL MURO
+# SUPERFICIES DEL MURO
 
 st.markdown("### 📐 Superficies del muro")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    mostrar_resultado("Superficie total", "superficie", 2, "m²")
     mostrar_resultado(
-        "Superficie de vanos", "superficie_vanos", 2, "m²"
+        "Superficie total",
+        "superficie",
+        2,
+        "m²"
+    )
+
+    mostrar_resultado(
+        "Superficie de vanos",
+        "superficie_vanos",
+        2,
+        "m²"
     )
 
 with col2:
     mostrar_resultado(
-        "Superficie neta", "superficie_neta", 2, "m²"
+        "Superficie neta",
+        "superficie_neta",
+        2,
+        "m²"
     )
-    mostrar_resultado("Volumen del muro", "volumen", 3, "m³")
+
+    mostrar_resultado(
+        "Volumen del muro",
+        "volumen",
+        3,
+        "m³"
+    )
 
 
-# DETALLE DE VANOS
+# DETALLE DE LOS VANOS
 
 if r is not None and r["detalle_vanos"]:
 
     with st.expander("Ver detalle de vanos"):
+
         for numero, area in enumerate(r["detalle_vanos"]):
-            st.write(f"Vano {numero + 1}: {area:.2f} m²")
+            st.write(
+                f"Vano {numero + 1}: {area:.2f} m²"
+            )
 
 
-# RESULTADOS DE LADRILLOS
+# CANTIDAD DE LADRILLOS
 
 st.divider()
+
 st.markdown("### 🧱 Cantidad de ladrillos")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    mostrar_resultado("Cantidad teórica", "ladrillos", 0, "unidades")
+    mostrar_resultado(
+        "Cantidad teórica",
+        "ladrillos",
+        0,
+        "unidades"
+    )
 
 with col2:
     mostrar_resultado(
-        "Cantidad con pérdidas", "ladrillos_finales", 0, "unidades"
+        "Cantidad con pérdidas",
+        "ladrillos_finales",
+        0,
+        "unidades"
     )
 
 if r is not None:
@@ -741,27 +823,39 @@ if r is not None:
     )
 
 
-# RESULTADOS DE MORTERO
+# MORTERO DE PEGA
 
 st.divider()
+
 st.markdown("### 🪣 Mortero de pega")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    mostrar_resultado("Mortero teórico", "mortero", 4, "m³")
+    mostrar_resultado(
+        "Mortero teórico",
+        "mortero",
+        4,
+        "m³"
+    )
 
 with col2:
     mostrar_resultado(
-        "Mortero con pérdidas", "mortero_final", 4, "m³"
+        "Mortero con pérdidas",
+        "mortero_final",
+        4,
+        "m³"
     )
 
 if r is not None:
+
     st.caption(
         f"Volumen equivalente con pérdidas: "
         f"{r['mortero_final'] * 1000:.2f} litros"
     )
+
 else:
+
     st.caption(
         "Ingresa las medidas y presiona Calcular cubicación "
         "para visualizar los resultados."
