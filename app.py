@@ -1,4 +1,3 @@
-
 import streamlit as st
 import math
 
@@ -189,6 +188,37 @@ st.markdown("""
             font-size: 1.1rem;
         }
     }
+
+/* CORREGIR COLOR DE ETIQUETAS */
+
+
+/* CORRECCION DEFINITIVA DE ETIQUETAS */
+
+/* Etiquetas de todas las casillas numericas */
+[data-testid="stNumberInput"] label,
+[data-testid="stNumberInput"] label *,
+[data-testid="stWidgetLabel"],
+[data-testid="stWidgetLabel"] * {
+    color: #173D37 !important;
+    opacity: 1 !important;
+    font-weight: 700 !important;
+    -webkit-text-fill-color: #173D37 !important;
+}
+
+/* Numeros dentro de las casillas */
+[data-testid="stNumberInput"] input {
+    color: #173D37 !important;
+    -webkit-text-fill-color: #173D37 !important;
+    background-color: #FFFFFF !important;
+    font-weight: 600 !important;
+}
+
+/* Textos de ayuda */
+[data-testid="stCaptionContainer"] p {
+    color: #58776F !important;
+    opacity: 1 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -714,3 +744,4 @@ st.markdown("""
     Desarrollado con Python y Streamlit
 </div>
 """, unsafe_allow_html=True)
+
