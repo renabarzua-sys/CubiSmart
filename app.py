@@ -275,6 +275,67 @@ st.markdown("""
     border-color: #127566 !important;
 }
 
+/* BOTON LIMPIAR RESULTADOS */
+
+.st-key-limpiar_resultados button {
+    background-color: #FFFFFF !important;
+    color: #163B39 !important;
+    border: 1px solid #C9E4D9 !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+}
+
+/* TEXTO VERDE OSCURO */
+
+.st-key-limpiar_resultados button p,
+.st-key-limpiar_resultados button span {
+    color: #163B39 !important;
+    -webkit-text-fill-color: #163B39 !important;
+}
+
+/* EFECTO AL PASAR EL CURSOR */
+
+.st-key-limpiar_resultados button:hover {
+    background-color: #EAF7F1 !important;
+    border-color: #127566 !important;
+}
+
+/* BOTONES DE AUMENTAR Y DISMINUIR */
+
+div[data-testid="stNumberInput"] button {
+    background-color: #163B39 !important;
+    color: #FFFFFF !important;
+    border-color: #163B39 !important;
+}
+
+/* SIGNOS + Y - EN BLANCO */
+
+div[data-testid="stNumberInput"] button svg {
+    fill: #FFFFFF !important;
+    stroke: #FFFFFF !important;
+    color: #FFFFFF !important;
+}
+
+/* EFECTO AL PASAR EL CURSOR */
+
+div[data-testid="stNumberInput"] button:hover {
+    background-color: #127566 !important;
+    border-color: #127566 !important;
+}
+
+/* CUADRO INFORMATIVO DEL LADRILLO */
+
+.aviso-ladrillo {
+    background-color: #163B39;
+    color: #FFFFFF;
+    padding: 18px 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -495,10 +556,18 @@ titulo_seccion("03", "Características del ladrillo")
 
 with st.container(border=True):
 
-    st.info(
-        "Ingresa el largo y el alto de la cara visible "
-        "del ladrillo. El ancho corresponde al espesor "
-        "del muro en este modelo simplificado."
+   
+st.markdown(
+    """
+    <div class="aviso-ladrillo">
+        Ingresa el largo y el alto de la cara visible
+        del ladrillo. El ancho corresponde al espesor
+        del muro en este modelo simplificado.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
     )
 
     col1, col2, col3 = st.columns(3)
@@ -595,6 +664,7 @@ with col_calcular:
 with col_limpiar:
     limpiar = st.button(
         "Limpiar resultados",
+        key="limpiar_resultados",
         use_container_width=True
     )
 
@@ -848,6 +918,15 @@ st.caption(
     f"{r['mortero_final'] * 1000:.2f} litros"
 )
 
+st.warning(
+    "Los resultados son estimaciones geométricas "
+    "para un prototipo académico. No consideran "
+    "todas las características constructivas, "
+    "mortero dentro de perforaciones ni "
+    "superposición entre vanos. "
+    "Verifica las especificaciones y rendimientos "
+    "antes de utilizarlos en una obra real."
+)
 
 
 # ==========================================
