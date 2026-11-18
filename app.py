@@ -7,7 +7,7 @@ import math
 # ==========================================
 
 st.set_page_config(
-    page_title="CubiMat | Cubicación de materiales",
+    page_title="CubiSmart | Cubicación de materiales",
     page_icon="🧱",
     layout="wide",
     initial_sidebar_state="collapsed"
