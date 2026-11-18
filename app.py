@@ -248,6 +248,33 @@ st.markdown("""
     background: #F4F8F6;
 }
 
+/* BOTON VOLVER A ELEGIR PARTIDA */
+
+.st-key-volver_partidas button {
+    background-color: #FFFFFF !important;
+    color: #163B39 !important;
+    border: 1px solid #C9E4D9 !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* COLOR DE LAS LETRAS */
+
+.st-key-volver_partidas button p,
+.st-key-volver_partidas button span {
+    color: #163B39 !important;
+    -webkit-text-fill-color: #163B39 !important;
+}
+
+/* EFECTO AL PASAR EL CURSOR */
+
+.st-key-volver_partidas button:hover {
+    background-color: #EAF7F1 !important;
+    color: #127566 !important;
+    border-color: #127566 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
