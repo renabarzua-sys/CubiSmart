@@ -554,19 +554,19 @@ with st.container(border=True):
 
 titulo_seccion("03", "Características del ladrillo")
 
+
 with st.container(border=True):
 
-   
-st.markdown(
-    """
-    <div class="aviso-ladrillo">
-        Ingresa el largo y el alto de la cara visible
-        del ladrillo. El ancho corresponde al espesor
-        del muro en este modelo simplificado.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+    st.markdown(
+        """
+        <div class="aviso-ladrillo">
+            Ingresa el largo y el alto de la cara visible
+            del ladrillo. El ancho corresponde al espesor
+            del muro en este modelo simplificado.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
     col1, col2, col3 = st.columns(3)
