@@ -848,15 +848,6 @@ st.caption(
     f"{r['mortero_final'] * 1000:.2f} litros"
 )
 
-st.warning(
-    "Los resultados son estimaciones geométricas "
-    "para un prototipo académico. No consideran "
-    "todas las características constructivas, "
-    "mortero dentro de perforaciones ni "
-    "superposición entre vanos. "
-    "Verifica las especificaciones y rendimientos "
-    "antes de utilizarlos en una obra real."
-)
 
 
 # ==========================================
