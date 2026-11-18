@@ -1,13 +1,13 @@
 
-import math
 import streamlit as st
+import math
 
 # ==========================================
 # 1. CONFIGURACION GENERAL
 # ==========================================
 
 st.set_page_config(
-    page_title="CubiSmart | Cubicación de materiales",
+    page_title="CubiMat | Cubicación de materiales",
     page_icon="🧱",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -19,291 +19,233 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+    .stApp {
+        background:
+            radial-gradient(circle at 85% 5%, #D5EEE5 0%, transparent 35%),
+            radial-gradient(circle at 5% 80%, #E2EFEC 0%, transparent 35%),
+            linear-gradient(135deg, #F5F9F7, #E9F3EF);
+        color: #163B39;
+    }
 
-/* FONDO GENERAL */
-.stApp {
-    background:
-        radial-gradient(circle at 85% 5%, #D5EEE5 0%, transparent 35%),
-        radial-gradient(circle at 5% 80%, #E2EFEC 0%, transparent 35%),
-        linear-gradient(135deg, #F5F9F7, #E9F3EF);
-}
+    .block-container {
+        max-width: 1100px;
+        padding: 2rem 3rem 4rem;
+    }
 
-.block-container {
-    max-width: 1100px;
-    padding: 2rem 3rem 4rem;
-}
+    h1, h2, h3 {
+        color: #163B39 !important;
+        letter-spacing: -0.5px;
+    }
 
-/* TITULOS GENERALES */
-h1, h2, h3, h4 {
-    color: #163B39 !important;
-    letter-spacing: -0.5px;
-}
+    .hero {
+        background: linear-gradient(115deg, #124F49, #208C79);
+        border-radius: 24px;
+        padding: 35px 38px;
+        margin-bottom: 25px;
+        color: white;
+        box-shadow: 0 15px 35px rgba(15, 87, 73, 0.20);
+        position: relative;
+        overflow: hidden;
+    }
 
-/* PORTADA */
-.hero {
-    background: linear-gradient(115deg, #124F49, #208C79);
-    padding: 35px 38px;
-    border-radius: 24px;
-    margin-bottom: 25px;
-    box-shadow: 0 15px 35px rgba(15,87,73,0.20);
-    position: relative;
-    overflow: hidden;
-}
+    .hero::after {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        right: -50px;
+        top: -80px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        pointer-events: none;
+    }
 
-.hero::after {
-    content: "";
-    position: absolute;
-    width: 220px;
-    height: 220px;
-    right: -50px;
-    top: -80px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 50%;
-    pointer-events: none;
-}
+    .hero h1 {
+        color: white !important;
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
 
-.hero h1 {
-    color: #FFFFFF !important;
-    font-size: 2.8rem;
-    font-weight: 800;
-    margin-bottom: 5px;
-}
+    .hero p {
+        color: #D8F3EA;
+        font-size: 1.05rem;
+        margin-bottom: 0;
+    }
 
-.hero p {
-    color: #E0F7EE !important;
-    font-size: 1.05rem;
-}
+    .hero-tag {
+        display: inline-block;
+        background: rgba(255,255,255,0.13);
+        border: 1px solid rgba(255,255,255,0.18);
+        border-radius: 50px;
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
 
-.hero-tag {
-    display: inline-block;
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.20);
-    border-radius: 50px;
-    padding: 6px 14px;
-    color: #FFFFFF;
-    font-size: 0.8rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-}
+    .section-heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 12px 0 18px;
+    }
 
-/* TITULOS DE SECCIONES */
-.section-heading {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 18px 0;
-}
+    .section-number {
+        background: #DDF3EB;
+        color: #127566;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-weight: 800;
+    }
 
-.section-number {
-    background: #DDF3EB;
-    color: #127566;
-    width: 38px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    font-weight: 800;
-}
+    .section-title {
+        color: #163B39;
+        font-size: 1.3rem;
+        font-weight: 750;
+    }
 
-.section-title {
-    color: #163B39;
-    font-size: 1.3rem;
-    font-weight: 750;
-}
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        border-radius: 20px;
+    }
 
-/* TARJETAS DE FORMULARIO */
-div[data-testid="stVerticalBlockBorderWrapper"] {
-    border-radius: 20px;
-}
+    div[data-testid="stWidgetLabel"] p {
+        color: #315A52 !important;
+        font-weight: 600;
+    }
 
-/* ETIQUETAS DE LAS MEDIDAS */
+    div[data-testid="stNumberInput"] input {
+        background-color: #F7FAF9;
+        color: #163B39;
+        border-radius: 10px;
+    }
+
+    .stButton > button[kind="primary"] {
+        background: linear-gradient(115deg, #127566, #20A38B);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        min-height: 55px;
+        font-size: 1.05rem;
+        font-weight: 750;
+        box-shadow: 0 9px 23px rgba(18, 117, 102, 0.22);
+        transition: all 0.2s ease;
+    }
+
+    .stButton > button[kind="primary"]:hover {
+        background: linear-gradient(115deg, #0D6255, #188E79);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 13px 26px rgba(18, 117, 102, 0.28);
+    }
+
+    div[data-testid="stMetric"] {
+        background: linear-gradient(135deg, #FFFFFF, #EAF7F1);
+        padding: 23px;
+        border-radius: 18px;
+        border: 1px solid #D7E9E0;
+        box-shadow: 0 7px 22px rgba(22, 73, 59, 0.07);
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #127566;
+        font-weight: 800;
+    }
+
+    div[data-testid="stMetricLabel"] {
+        color: #486A62;
+    }
+
+    hr {
+        border-color: #D5E7DE !important;
+    }
+
+    .footer {
+        text-align: center;
+        padding: 25px 10px;
+        color: #6F9187;
+        font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+        .block-container {
+            padding: 1rem 0.8rem 2rem;
+        }
+
+        .hero {
+            padding: 25px 20px;
+            border-radius: 18px;
+        }
+
+        .hero h1 {
+            font-size: 2.1rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+        }
+    }
+
+/* CORREGIR COLOR DE ETIQUETAS */
+
+
+/* CORRECCION DEFINITIVA DE ETIQUETAS */
+
+/* Etiquetas de todas las casillas numericas */
 [data-testid="stNumberInput"] label,
 [data-testid="stNumberInput"] label *,
 [data-testid="stWidgetLabel"],
 [data-testid="stWidgetLabel"] * {
     color: #173D37 !important;
-    -webkit-text-fill-color: #173D37 !important;
     opacity: 1 !important;
     font-weight: 700 !important;
+    -webkit-text-fill-color: #173D37 !important;
 }
 
-/* ======================================
-   NUEVO DISEÑO DE CASILLAS NUMERICAS
-   ====================================== */
-
-/* CONTENEDOR EXTERIOR */
-[data-testid="stNumberInput"] div[data-baseweb="input"] {
-    background-color: #FFFFFF !important;
-    border: 1px solid #B8DDD0 !important;
-    border-radius: 12px !important;
-    box-shadow: none !important;
-    overflow: hidden !important;
-}
-
-/* ELEMENTO INTERIOR DEL CAMPO */
-[data-testid="stNumberInput"] div[data-baseweb="base-input"] {
-    background-color: #FFFFFF !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-/* AL SELECCIONAR LA CASILLA */
-[data-testid="stNumberInput"] div[data-baseweb="input"]:focus-within {
-    border-color: #127566 !important;
-    box-shadow: 0 0 0 2px rgba(18,117,102,0.12) !important;
-}
-
-/* QUITAR CONTORNO NEGRO INTERNO */
+/* Numeros dentro de las casillas */
 [data-testid="stNumberInput"] input {
     color: #173D37 !important;
     -webkit-text-fill-color: #173D37 !important;
     background-color: #FFFFFF !important;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
     font-weight: 600 !important;
 }
 
-/* MANTENER EL FOCO SIN BORDE NEGRO */
-[data-testid="stNumberInput"] input:focus {
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-/* BOTONES MENOS Y MAS */
-[data-testid="stNumberInput"] button {
-    background-color: #DDF3EB !important;
-    color: #173D37 !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-/* ICONOS MENOS Y MAS */
-[data-testid="stNumberInput"] button svg {
-    color: #173D37 !important;
-    stroke: #173D37 !important;
-}
-
-/* EFECTO AL PASAR EL CURSOR */
-[data-testid="stNumberInput"] button:hover {
-    background-color: #BDE5D7 !important;
-}
-
-[data-testid="stNumberInput"] button:hover svg {
-    color: #0D6255 !important;
-    stroke: #0D6255 !important;
-}
-
-/* ======================================
-   TEXTOS DE AYUDA
-   ====================================== */
-
-[data-testid="stCaptionContainer"],
-[data-testid="stCaptionContainer"] p,
-[data-testid="stCaptionContainer"] span {
-    color: #173D37 !important;
-    -webkit-text-fill-color: #173D37 !important;
+/* Textos de ayuda */
+[data-testid="stCaptionContainer"] p {
+    color: #58776F !important;
     opacity: 1 !important;
-    font-weight: 500 !important;
 }
 
-/* TEXTO GENERAL */
-[data-testid="stMarkdownContainer"] p {
-    line-height: 1.6;
-}
+/* TARJETAS DEL MENU DE PARTIDAS */
 
-/* BOTON CALCULAR */
-.stButton > button[kind="primary"] {
-    background: linear-gradient(115deg, #127566, #20A38B);
-    color: #FFFFFF !important;
-    border: none;
-    border-radius: 14px;
-    min-height: 55px;
-    font-size: 1.05rem;
+.st-key-menu_partidas div.stButton > button {
+    min-height: 145px;
+    width: 100%;
+    border-radius: 20px;
+    border: 2px solid #C9E4D9;
+    background: #FFFFFF;
+    color: #163B39;
+    font-size: 1.25rem;
     font-weight: 750;
-    box-shadow: 0 9px 23px rgba(18,117,102,0.22);
-    transition: all 0.2s ease;
+    box-shadow: 0 8px 22px rgba(18, 92, 78, 0.09);
+    transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.stButton > button[kind="primary"]:hover {
-    background: linear-gradient(115deg, #0D6255, #188E79);
-    color: #FFFFFF !important;
-    transform: translateY(-2px);
+.st-key-menu_partidas div.stButton > button:hover:not(:disabled) {
+    transform: translateY(-3px);
+    border-color: #16816E;
+    color: #127566;
+    background: #F3FBF7;
 }
 
-/* BOTON LIMPIAR */
-.stButton > button[kind="secondary"] {
-    background-color: #E2F1EB;
-    color: #173D37 !important;
-    border: 1px solid #B8DDD0;
-    border-radius: 14px;
-    min-height: 55px;
-}
-
-/* TARJETAS DE RESULTADOS */
-[data-testid="stMetric"] {
-    background: linear-gradient(135deg, #FFFFFF, #EAF7F1);
-    padding: 23px;
-    border: 1px solid #D7E9E0;
-    border-radius: 18px;
-    box-shadow: 0 7px 22px rgba(22,73,59,0.07);
-}
-
-/* TITULOS DE LOS RESULTADOS */
-[data-testid="stMetricLabel"],
-[data-testid="stMetricLabel"] * {
-    color: #173D37 !important;
-    -webkit-text-fill-color: #173D37 !important;
-    opacity: 1 !important;
-    font-weight: 700 !important;
-}
-
-/* VALORES DE LOS RESULTADOS */
-[data-testid="stMetricValue"],
-[data-testid="stMetricValue"] * {
-    color: #127566 !important;
-    -webkit-text-fill-color: #127566 !important;
-    opacity: 1 !important;
-    font-weight: 800 !important;
-}
-
-/* SEPARADORES */
-hr {
-    border-color: #D5E7DE !important;
-}
-
-/* PIE DE PAGINA */
-.footer {
-    text-align: center;
-    padding: 25px 10px;
-    color: #406A60;
-    font-size: 0.85rem;
-}
-
-/* ADAPTACION PARA CELULARES */
-@media (max-width: 768px) {
-    .block-container {
-        padding: 1rem 0.8rem 2rem;
-    }
-
-    .hero {
-        padding: 25px 20px;
-        border-radius: 18px;
-    }
-
-    .hero h1 {
-        font-size: 2.1rem;
-    }
-
-    .section-title {
-        font-size: 1.1rem;
-    }
-
-    [data-testid="stMetric"] {
-        padding: 15px;
-    }
+.st-key-menu_partidas div.stButton > button:disabled {
+    opacity: 0.65;
+    color: #6F9187;
+    background: #F4F8F6;
 }
 
 </style>
@@ -311,15 +253,32 @@ hr {
 
 
 # ==========================================
-# 3. RESULTADOS INICIALES VACIOS
+# 3. RESULTADOS INICIALES EN CERO
 # ==========================================
+
+def resultados_vacios():
+    return {
+        "superficie": 0.0,
+        "superficie_vanos": 0.0,
+        "superficie_neta": 0.0,
+        "volumen": 0.0,
+        "ladrillos": 0,
+        "ladrillos_finales": 0,
+        "mortero": 0.0,
+        "mortero_final": 0.0,
+        "superficie_modular": 0.0,
+        "detalle_vanos": []
+    }
+
 
 if "resultados" not in st.session_state:
-    st.session_state.resultados = None
-
+    st.session_state.resultados = resultados_vacios()
+# Partida elegida por el usuario
+if "partida_seleccionada" not in st.session_state:
+    st.session_state.partida_seleccionada = None
 
 # ==========================================
-# 4. PORTADA
+# 4. PORTADA PRINCIPAL
 # ==========================================
 
 st.markdown("""
@@ -327,25 +286,92 @@ st.markdown("""
     <span class="hero-tag">HERRAMIENTA DE CUBICACIÓN</span>
     <h1>🧱 CubiSmart</h1>
     <p>
-        Calcula las cantidades estimadas de ladrillos
-        y mortero para tus proyectos de albañilería.
+        Selecciona una partida de construcción para comenzar
+        a cubicar sus materiales de forma sencilla. 
     </p>
 </div>
 """, unsafe_allow_html=True)
 
 
 # ==========================================
-# 5. TITULOS DE SECCIONES
+# 5. FUNCION PARA TITULOS
 # ==========================================
+
+# ==========================================
+# 6. MENU DE SELECCION DE PARTIDAS
+# ==========================================
+
+if st.session_state.partida_seleccionada is None:
+
+    st.markdown("## ¿Qué partida deseas cubicar?")
+
+    st.caption(
+        "Selecciona una tarjeta para ingresar las dimensiones."
+    )
+
+    with st.container(key="menu_partidas"):
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            if st.button(
+                "🧱 Albañilería",
+                key="partida_albanileria",
+                use_container_width=True
+            ):
+                st.session_state.partida_seleccionada = "albanileria"
+                st.rerun()
+
+        with col2:
+            st.button(
+                "🏗️ Hormigón · Próximamente",
+                key="partida_hormigon",
+                use_container_width=True,
+                disabled=True
+            )
+
+        col3, col4 = st.columns(2)
+
+        with col3:
+            st.button(
+                "🎨 Pintura · Próximamente",
+                key="partida_pintura",
+                use_container_width=True,
+                disabled=True
+            )
+
+        with col4:
+            st.button(
+                "🚰 Instalaciones · Próximamente",
+                key="partida_instalaciones",
+                use_container_width=True,
+                disabled=True
+            )
+
+    # Ocultar los calculos hasta seleccionar una partida
+    st.stop()
+
+
+# BOTON PARA VOLVER AL MENU
+
+if st.button(
+    "← Volver a elegir partida",
+    key="volver_partidas"
+):
+    st.session_state.partida_seleccionada = None
+    st.session_state.resultados = resultados_vacios()
+    st.rerun()
+
+st.markdown("### 🧱 Cubicación de albañilería")
 
 def titulo_seccion(numero, nombre):
     st.markdown(
-        f"""
+        f'''
         <div class="section-heading">
             <div class="section-number">{numero}</div>
             <div class="section-title">{nombre}</div>
         </div>
-        """,
+        ''',
         unsafe_allow_html=True
     )
 
@@ -364,20 +390,18 @@ with st.container(border=True):
         largo = st.number_input(
             "Largo del muro (m)",
             min_value=0.0,
-            value=None,
+            value=0.0,
             step=0.1,
-            format="%.2f",
-            key="largo_muro"
+            format="%.2f"
         )
 
     with col2:
         alto = st.number_input(
             "Alto del muro (m)",
             min_value=0.0,
-            value=None,
+            value=0.0,
             step=0.1,
-            format="%.2f",
-            key="alto_muro"
+            format="%.2f"
         )
 
     st.caption(
@@ -397,19 +421,17 @@ with st.container(border=True):
         "Cantidad de vanos",
         min_value=0,
         max_value=30,
-        value=None,
-        step=1,
-        key="cantidad_vanos"
+        value=0,
+        step=1
     )
 
     st.caption(
-        "Si el muro no tiene vanos, deja la casilla vacía "
-        "o escribe 0."
+        "Considera puertas, ventanas y otras aberturas."
     )
 
     vanos = []
 
-    for numero in range(cantidad_vanos or 0):
+    for numero in range(cantidad_vanos):
 
         st.markdown(f"#### Vano {numero + 1}")
 
@@ -419,7 +441,7 @@ with st.container(border=True):
             ancho_vano = st.number_input(
                 f"Ancho del vano {numero + 1} (m)",
                 min_value=0.0,
-                value=None,
+                value=0.0,
                 step=0.1,
                 format="%.2f",
                 key=f"ancho_vano_{numero}"
@@ -429,7 +451,7 @@ with st.container(border=True):
             alto_vano = st.number_input(
                 f"Alto del vano {numero + 1} (m)",
                 min_value=0.0,
-                value=None,
+                value=0.0,
                 step=0.1,
                 format="%.2f",
                 key=f"alto_vano_{numero}"
@@ -447,9 +469,9 @@ titulo_seccion("03", "Características del ladrillo")
 with st.container(border=True):
 
     st.info(
-        "Ingresa el largo y alto de la cara visible "
-        "del ladrillo. El ancho representa el espesor "
-        "del muro en este modelo."
+        "Ingresa el largo y el alto de la cara visible "
+        "del ladrillo. El ancho corresponde al espesor "
+        "del muro en este modelo simplificado."
     )
 
     col1, col2, col3 = st.columns(3)
@@ -458,43 +480,39 @@ with st.container(border=True):
         largo_ladrillo = st.number_input(
             "Largo (m)",
             min_value=0.0,
-            value=None,
+            value=0.0,
             step=0.01,
-            format="%.3f",
-            key="largo_ladrillo"
+            format="%.3f"
         )
 
     with col2:
         alto_ladrillo = st.number_input(
             "Alto (m)",
             min_value=0.0,
-            value=None,
+            value=0.0,
             step=0.01,
-            format="%.3f",
-            key="alto_ladrillo"
+            format="%.3f"
         )
 
     with col3:
         ancho_ladrillo = st.number_input(
             "Ancho (m)",
             min_value=0.0,
-            value=None,
+            value=0.0,
             step=0.01,
-            format="%.3f",
-            key="ancho_ladrillo"
+            format="%.3f"
         )
 
     junta_mortero = st.number_input(
         "Espesor de junta de mortero (m)",
         min_value=0.0,
-        value=None,
+        value=0.0,
         step=0.005,
-        format="%.3f",
-        key="junta_mortero"
+        format="%.3f"
     )
 
     st.caption(
-        "Ejemplo: 1 cm de junta equivale a 0.010 m."
+        "Ejemplo: una junta de 1 cm equivale a 0.01 m."
     )
 
 
@@ -512,25 +530,23 @@ with st.container(border=True):
         porcentaje_perdida = st.number_input(
             "Pérdida de ladrillos (%)",
             min_value=0.0,
-            value=None,
+            value=0.0,
             step=1.0,
-            format="%.1f",
-            key="perdida_ladrillos"
+            format="%.1f"
         )
 
     with col2:
         porcentaje_perdida_mortero = st.number_input(
             "Pérdida de mortero (%)",
             min_value=0.0,
-            value=None,
+            value=0.0,
             step=1.0,
-            format="%.1f",
-            key="perdida_mortero"
+            format="%.1f"
         )
 
     st.caption(
-        "Si no deseas considerar pérdidas, escribe 0 "
-        "en ambos campos."
+        "Introduce los porcentajes de pérdida "
+        "que deseas considerar en el cálculo."
     )
 
 
@@ -561,42 +577,24 @@ with col_limpiar:
 # ==========================================
 
 if limpiar:
-    st.session_state.resultados = None
+    st.session_state.resultados = resultados_vacios()
 
 
 # ==========================================
-# 12. CALCULOS
+# 12. OPERACIONES MATEMATICAS
 # ==========================================
 
 if calcular:
 
-    # VALIDAR CAMPOS OBLIGATORIOS
-
-    campos = {
-        "Largo del muro": largo,
-        "Alto del muro": alto,
-        "Largo del ladrillo": largo_ladrillo,
-        "Alto del ladrillo": alto_ladrillo,
-        "Ancho del ladrillo": ancho_ladrillo,
-        "Espesor de junta": junta_mortero,
-        "Pérdida de ladrillos": porcentaje_perdida,
-        "Pérdida de mortero": porcentaje_perdida_mortero
-    }
-
-    for nombre, valor in campos.items():
-        if valor is None:
-            st.error(f"Debes ingresar: {nombre}.")
-            st.stop()
-
-    # VALIDAR DIMENSIONES DEL MURO
+    # VALIDAR MURO
 
     if largo <= 0 or alto <= 0:
         st.error(
-            "Las dimensiones del muro deben ser mayores que cero."
+            "El largo y el alto del muro deben ser mayores que cero."
         )
         st.stop()
 
-    # VALIDAR DIMENSIONES DEL LADRILLO
+    # VALIDAR LADRILLO
 
     if (
         largo_ladrillo <= 0
@@ -604,26 +602,20 @@ if calcular:
         or ancho_ladrillo <= 0
     ):
         st.error(
-            "Las dimensiones del ladrillo deben ser mayores que cero."
+            "Todas las dimensiones del ladrillo deben ser mayores que cero."
         )
         st.stop()
 
-    # CALCULAR SUPERFICIE DE LOS VANOS
+    # VALIDAR LOS VANOS
 
     superficie_total_vanos = 0.0
     superficies_individuales = []
 
     for numero, (ancho_vano, alto_vano) in enumerate(vanos):
 
-        if ancho_vano is None or alto_vano is None:
-            st.error(
-                f"Debes completar las medidas del vano {numero + 1}."
-            )
-            st.stop()
-
         if ancho_vano <= 0 or alto_vano <= 0:
             st.error(
-                f"Las medidas del vano {numero + 1} "
+                f"Las dimensiones del vano {numero + 1} "
                 "deben ser mayores que cero."
             )
             st.stop()
@@ -638,33 +630,37 @@ if calcular:
         superficie_vano = ancho_vano * alto_vano
 
         superficie_total_vanos += superficie_vano
+
         superficies_individuales.append(superficie_vano)
 
-    # CALCULAR SUPERFICIE NETA
+    # CALCULAR SUPERFICIE DEL MURO
 
     superficie = largo * alto
+
     superficie_neta = superficie - superficie_total_vanos
 
     if superficie_neta <= 0:
         st.error(
-            "La superficie de los vanos es igual o superior "
-            "a la superficie del muro."
+            "La superficie total de vanos es igual o "
+            "superior a la superficie del muro."
         )
         st.stop()
 
     # CALCULAR VOLUMEN DEL MURO
 
     espesor = ancho_ladrillo
+
     volumen = superficie_neta * espesor
 
-    # CALCULAR SUPERFICIE MODULAR
+    # DIMENSIONES MODULARES
 
     largo_modular = largo_ladrillo + junta_mortero
     alto_modular = alto_ladrillo + junta_mortero
 
     superficie_modular = largo_modular * alto_modular
+    superficie_ladrillo = largo_ladrillo * alto_ladrillo
 
-    # CALCULAR CANTIDAD DE LADRILLOS
+    # CALCULAR LADRILLOS
 
     cantidad_ladrillos = superficie_neta / superficie_modular
 
@@ -680,14 +676,18 @@ if calcular:
         round(cantidad_con_perdida, 9)
     )
 
-    # CALCULAR MORTERO DE PEGA
+    # CALCULAR MORTERO
 
     volumen_ladrillo = (
-        largo_ladrillo * alto_ladrillo * ancho_ladrillo
+        largo_ladrillo
+        * alto_ladrillo
+        * ancho_ladrillo
     )
 
     volumen_modular = (
-        largo_modular * alto_modular * ancho_ladrillo
+        largo_modular
+        * alto_modular
+        * ancho_ladrillo
     )
 
     mortero_por_modulo = volumen_modular - volumen_ladrillo
@@ -698,7 +698,7 @@ if calcular:
         1 + porcentaje_perdida_mortero / 100
     )
 
-    # GUARDAR RESULTADOS
+    # GUARDAR RESULTADOS EN LA SESION
 
     st.session_state.resultados = {
         "superficie": superficie,
@@ -717,7 +717,7 @@ if calcular:
 
 
 # ==========================================
-# 13. RESULTADOS
+# 13. RESULTADOS SIEMPRE VISIBLES
 # ==========================================
 
 r = st.session_state.resultados
@@ -726,73 +726,51 @@ st.divider()
 
 st.markdown("## 📊 Resultados de cubicación")
 
-
-# FUNCION PARA MOSTRAR RESULTADOS
-
-def mostrar_resultado(nombre, clave, decimales=2, unidad=""):
-
-    if r is None:
-        valor = "—"
-
-    elif decimales == 0:
-        valor = f"{r[clave]:.0f} {unidad}".strip()
-
-    else:
-        valor = f"{r[clave]:.{decimales}f} {unidad}".strip()
-
-    st.metric(nombre, valor)
-
-
-# SUPERFICIES DEL MURO
+# SUPERFICIES
 
 st.markdown("### 📐 Superficies del muro")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    mostrar_resultado(
+    st.metric(
         "Superficie total",
-        "superficie",
-        2,
-        "m²"
+        f"{r['superficie']:.2f} m²"
     )
 
-    mostrar_resultado(
+    st.metric(
         "Superficie de vanos",
-        "superficie_vanos",
-        2,
-        "m²"
+        f"{r['superficie_vanos']:.2f} m²"
     )
 
 with col2:
-    mostrar_resultado(
+    st.metric(
         "Superficie neta",
-        "superficie_neta",
-        2,
-        "m²"
+        f"{r['superficie_neta']:.2f} m²"
     )
 
-    mostrar_resultado(
+    st.metric(
         "Volumen del muro",
-        "volumen",
-        3,
-        "m³"
+        f"{r['volumen']:.3f} m³"
     )
 
 
-# DETALLE DE LOS VANOS
+# DETALLE DE VANOS
 
-if r is not None and r["detalle_vanos"]:
+if r["detalle_vanos"]:
 
     with st.expander("Ver detalle de vanos"):
 
-        for numero, area in enumerate(r["detalle_vanos"]):
+        for numero, superficie_vano in enumerate(
+            r["detalle_vanos"]
+        ):
             st.write(
-                f"Vano {numero + 1}: {area:.2f} m²"
+                f"Vano {numero + 1}: "
+                f"{superficie_vano:.2f} m²"
             )
 
 
-# CANTIDAD DE LADRILLOS
+# RESULTADOS DE LADRILLOS
 
 st.divider()
 
@@ -801,29 +779,24 @@ st.markdown("### 🧱 Cantidad de ladrillos")
 col1, col2 = st.columns(2)
 
 with col1:
-    mostrar_resultado(
+    st.metric(
         "Cantidad teórica",
-        "ladrillos",
-        0,
-        "unidades"
+        f"{r['ladrillos']} unidades"
     )
 
 with col2:
-    mostrar_resultado(
+    st.metric(
         "Cantidad con pérdidas",
-        "ladrillos_finales",
-        0,
-        "unidades"
+        f"{r['ladrillos_finales']} unidades"
     )
 
-if r is not None:
-    st.caption(
-        f"Superficie modular del ladrillo: "
-        f"{r['superficie_modular']:.4f} m²"
-    )
+st.caption(
+    f"Superficie modular del ladrillo: "
+    f"{r['superficie_modular']:.4f} m²"
+)
 
 
-# MORTERO DE PEGA
+# RESULTADOS DE MORTERO
 
 st.divider()
 
@@ -832,41 +805,30 @@ st.markdown("### 🪣 Mortero de pega")
 col1, col2 = st.columns(2)
 
 with col1:
-    mostrar_resultado(
+    st.metric(
         "Mortero teórico",
-        "mortero",
-        4,
-        "m³"
+        f"{r['mortero']:.4f} m³"
     )
 
 with col2:
-    mostrar_resultado(
+    st.metric(
         "Mortero con pérdidas",
-        "mortero_final",
-        4,
-        "m³"
+        f"{r['mortero_final']:.4f} m³"
     )
 
-if r is not None:
-
-    st.caption(
-        f"Volumen equivalente con pérdidas: "
-        f"{r['mortero_final'] * 1000:.2f} litros"
-    )
-
-else:
-
-    st.caption(
-        "Ingresa las medidas y presiona Calcular cubicación "
-        "para visualizar los resultados."
-    )
+st.caption(
+    f"Volumen equivalente con pérdidas: "
+    f"{r['mortero_final'] * 1000:.2f} litros"
+)
 
 st.warning(
-    "Estimación geométrica para prototipo académico. "
-    "No considera perforaciones del ladrillo, "
-    "juntas parciales ni superposición entre vanos. "
-    "Verifica los rendimientos antes de utilizar "
-    "las cantidades en una obra real."
+    "Los resultados son estimaciones geométricas "
+    "para un prototipo académico. No consideran "
+    "todas las características constructivas, "
+    "mortero dentro de perforaciones ni "
+    "superposición entre vanos. "
+    "Verifica las especificaciones y rendimientos "
+    "antes de utilizarlos en una obra real."
 )
 
 
