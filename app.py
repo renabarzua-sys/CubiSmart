@@ -338,15 +338,18 @@ div[data-testid="stNumberInput"] button:hover {
 
 /* TITULOS DENTRO DE LOS CUADROS DE RESULTADOS */
 
-div[data-testid="stMetricLabel"],
-div[data-testid="stMetricLabel"] p,
-div[data-testid="stMetricLabel"] span,
-div[data-testid="stMetricLabel"] * {
+
+/* ETIQUETAS DE LOS RESULTADOS */
+
+[data-testid="stMetric"] [data-testid="stMetricLabel"],
+[data-testid="stMetric"] [data-testid="stMetricLabel"] *,
+[data-testid="stMetric"] [data-testid="stMetricLabel"] p {
     color: #163B39 !important;
     -webkit-text-fill-color: #163B39 !important;
     opacity: 1 !important;
     font-weight: 800 !important;
 }
+
 
 </style>
 """, unsafe_allow_html=True)
