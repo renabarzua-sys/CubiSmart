@@ -1,5 +1,12 @@
+
 import streamlit as st
 import math
+import sqlite3
+import json
+from pathlib import Path
+from contextlib import closing
+from copy import deepcopy
+import pandas as pd
 
 # ==========================================
 # 1. CONFIGURACION GENERAL
@@ -9,961 +16,237 @@ st.set_page_config(
     page_title="CubiSmart | Cubicación de materiales",
     page_icon="🧱",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
-# ==========================================
-# 2. DISEÑO VISUAL
-# ==========================================
 
-st.markdown("""
-<style>
-    .stApp {
-        background:
-            radial-gradient(circle at 85% 5%, #D5EEE5 0%, transparent 35%),
-            radial-gradient(circle at 5% 80%, #E2EFEC 0%, transparent 35%),
-            linear-gradient(135deg, #F5F9F7, #E9F3EF);
-        color: #163B39;
-    }
-
-    .block-container {
-        max-width: 1100px;
-        padding: 2rem 3rem 4rem;
-    }
-
-    h1, h2, h3 {
-        color: #163B39 !important;
-        letter-spacing: -0.5px;
-    }
-
-    .hero {
-        background: linear-gradient(115deg, #124F49, #208C79);
-        border-radius: 24px;
-        padding: 35px 38px;
-        margin-bottom: 25px;
-        color: white;
-        box-shadow: 0 15px 35px rgba(15, 87, 73, 0.20);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .hero::after {
-        content: "";
-        position: absolute;
-        width: 220px;
-        height: 220px;
-        right: -50px;
-        top: -80px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-
-    .hero h1 {
-        color: white !important;
-        font-size: 2.8rem;
-        font-weight: 800;
-        margin-bottom: 5px;
-    }
-
-    .hero p {
-        color: #D8F3EA;
-        font-size: 1.05rem;
-        margin-bottom: 0;
-    }
-
-    .hero-tag {
-        display: inline-block;
-        background: rgba(255,255,255,0.13);
-        border: 1px solid rgba(255,255,255,0.18);
-        border-radius: 50px;
-        padding: 6px 14px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-bottom: 16px;
-    }
-
-    .section-heading {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 12px 0 18px;
-    }
-
-    .section-number {
-        background: #DDF3EB;
-        color: #127566;
-        width: 38px;
-        height: 38px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        font-weight: 800;
-    }
-
-    .section-title {
-        color: #163B39;
-        font-size: 1.3rem;
-        font-weight: 750;
-    }
-
-    div[data-testid="stVerticalBlockBorderWrapper"] {
-        border-radius: 20px;
-    }
-
-    div[data-testid="stWidgetLabel"] p {
-        color: #315A52 !important;
-        font-weight: 600;
-    }
-
-    div[data-testid="stNumberInput"] input {
-        background-color: #F7FAF9;
-        color: #163B39;
-        border-radius: 10px;
-    }
-
-    .stButton > button[kind="primary"] {
-        background: linear-gradient(115deg, #127566, #20A38B);
-        color: white;
-        border: none;
-        border-radius: 14px;
-        min-height: 55px;
-        font-size: 1.05rem;
-        font-weight: 750;
-        box-shadow: 0 9px 23px rgba(18, 117, 102, 0.22);
-        transition: all 0.2s ease;
-    }
-
-    .stButton > button[kind="primary"]:hover {
-        background: linear-gradient(115deg, #0D6255, #188E79);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 13px 26px rgba(18, 117, 102, 0.28);
-    }
-
-    div[data-testid="stMetric"] {
-        background: linear-gradient(135deg, #FFFFFF, #EAF7F1);
-        padding: 23px;
-        border-radius: 18px;
-        border: 1px solid #D7E9E0;
-        box-shadow: 0 7px 22px rgba(22, 73, 59, 0.07);
-    }
-
-    div[data-testid="stMetricValue"] {
-        color: #127566;
-        font-weight: 800;
-    }
-
-    div[data-testid="stMetricLabel"] {
-        color: #486A62;
-    }
-
-    hr {
-        border-color: #D5E7DE !important;
-    }
-
-    .footer {
-        text-align: center;
-        padding: 25px 10px;
-        color: #6F9187;
-        font-size: 0.85rem;
-    }
-
-    @media (max-width: 768px) {
-        .block-container {
-            padding: 1rem 0.8rem 2rem;
-        }
-
-        .hero {
-            padding: 25px 20px;
-            border-radius: 18px;
-        }
-
-        .hero h1 {
-            font-size: 2.1rem;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-        }
-    }
-
-/* CORREGIR COLOR DE ETIQUETAS */
-
-
-/* CORRECCION DEFINITIVA DE ETIQUETAS */
-
-/* Etiquetas de todas las casillas numericas */
-[data-testid="stNumberInput"] label,
-[data-testid="stNumberInput"] label *,
-[data-testid="stWidgetLabel"],
-[data-testid="stWidgetLabel"] * {
-    color: #173D37 !important;
-    opacity: 1 !important;
-    font-weight: 700 !important;
-    -webkit-text-fill-color: #173D37 !important;
-}
-
-/* Numeros dentro de las casillas */
-[data-testid="stNumberInput"] input {
-    color: #173D37 !important;
-    -webkit-text-fill-color: #173D37 !important;
-    background-color: #FFFFFF !important;
-    font-weight: 600 !important;
-}
-
-/* Textos de ayuda */
-[data-testid="stCaptionContainer"] p {
-    color: #58776F !important;
-    opacity: 1 !important;
-}
-
-/* TARJETAS DEL MENU DE PARTIDAS */
-
-.st-key-menu_partidas div.stButton > button {
-    min-height: 145px;
-    width: 100%;
-    border-radius: 20px;
-    border: 2px solid #C9E4D9;
-    background: #FFFFFF;
-    color: #163B39;
-    font-size: 1.25rem;
-    font-weight: 750;
-    box-shadow: 0 8px 22px rgba(18, 92, 78, 0.09);
-    transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-.st-key-menu_partidas div.stButton > button:hover:not(:disabled) {
-    transform: translateY(-3px);
-    border-color: #16816E;
-    color: #127566;
-    background: #F3FBF7;
-}
-
-.st-key-menu_partidas div.stButton > button:disabled {
-    opacity: 0.65;
-    color: #6F9187;
-    background: #F4F8F6;
-}
-
-/* BOTON VOLVER A ELEGIR PARTIDA */
-
-.st-key-volver_partidas button {
-    background-color: #FFFFFF !important;
-    color: #163B39 !important;
-    border: 1px solid #C9E4D9 !important;
-    border-radius: 12px !important;
-    font-weight: 700 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* COLOR DE LAS LETRAS */
-
-.st-key-volver_partidas button p,
-.st-key-volver_partidas button span {
-    color: #163B39 !important;
-    -webkit-text-fill-color: #163B39 !important;
-}
-
-/* EFECTO AL PASAR EL CURSOR */
-
-.st-key-volver_partidas button:hover {
-    background-color: #EAF7F1 !important;
-    color: #127566 !important;
-    border-color: #127566 !important;
-}
-
-/* BOTON LIMPIAR RESULTADOS */
-
-.st-key-limpiar_resultados button {
-    background-color: #FFFFFF !important;
-    color: #163B39 !important;
-    border: 1px solid #C9E4D9 !important;
-    border-radius: 12px !important;
-    font-weight: 700 !important;
-}
-
-/* TEXTO VERDE OSCURO */
-
-.st-key-limpiar_resultados button p,
-.st-key-limpiar_resultados button span {
-    color: #163B39 !important;
-    -webkit-text-fill-color: #163B39 !important;
-}
-
-/* EFECTO AL PASAR EL CURSOR */
-
-.st-key-limpiar_resultados button:hover {
-    background-color: #EAF7F1 !important;
-    border-color: #127566 !important;
-}
-
-/* BOTONES DE AUMENTAR Y DISMINUIR */
-
-div[data-testid="stNumberInput"] button {
-    background-color: #163B39 !important;
-    color: #FFFFFF !important;
-    border-color: #163B39 !important;
-}
-
-/* SIGNOS + Y - EN BLANCO */
-
-div[data-testid="stNumberInput"] button svg {
-    fill: #FFFFFF !important;
-    stroke: #FFFFFF !important;
-    color: #FFFFFF !important;
-}
-
-/* EFECTO AL PASAR EL CURSOR */
-
-div[data-testid="stNumberInput"] button:hover {
-    background-color: #127566 !important;
-    border-color: #127566 !important;
-}
-
-/* CUADRO INFORMATIVO DEL LADRILLO */
-
-.aviso-ladrillo {
-    background-color: #163B39;
-    color: #FFFFFF;
-    padding: 18px 20px;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 1.6;
-    margin-bottom: 18px;
-}
-
-/* TITULOS DENTRO DE LOS CUADROS DE RESULTADOS */
-
-
-/* ETIQUETAS DE LOS RESULTADOS */
-
-[data-testid="stMetric"] [data-testid="stMetricLabel"],
-[data-testid="stMetric"] [data-testid="stMetricLabel"] *,
-[data-testid="stMetric"] [data-testid="stMetricLabel"] p {
-    color: #163B39 !important;
-    -webkit-text-fill-color: #163B39 !important;
-    opacity: 1 !important;
-    font-weight: 800 !important;
-}
-
-
-</style>
-""", unsafe_allow_html=True)
-
-
-# ==========================================
-# 3. RESULTADOS INICIALES EN CERO
-# ==========================================
-
-def resultados_vacios():
-    return {
-        "superficie": 0.0,
-        "superficie_vanos": 0.0,
-        "superficie_neta": 0.0,
-        "volumen": 0.0,
-        "ladrillos": 0,
-        "ladrillos_finales": 0,
-        "mortero": 0.0,
-        "mortero_final": 0.0,
-        "superficie_modular": 0.0,
-        "detalle_vanos": []
-    }
-
-
-if "resultados" not in st.session_state:
-    st.session_state.resultados = resultados_vacios()
-# Partida elegida por el usuario
-if "partida_seleccionada" not in st.session_state:
-    st.session_state.partida_seleccionada = None
-
-# ==========================================
-# 4. PORTADA PRINCIPAL
-# ==========================================
+from partidas.catalogo import CATEGORIAS
+from servicios.estado import S, inicializar_estado
+from partidas.calculos_albanileria import resultados_vacios, calcular_muro
+from servicios.base_datos import db_conectar, db_iniciar, db_listar, db_crear, db_leer, db_guardar, db_eliminar, extras_leer, extras_guardar
+from servicios.gestion_muros import abrir_proyecto, crear_proyecto, cambiar_proyecto, datos_actuales, aviso, nuevo_muro, cargar_datos_prueba, calcular, guardar_muro, cargar_muro, eliminar_muro, limpiar_resultados, abrir_desde_inicio, crear_desde_inicio, volver_proyectos, eliminar_proyecto_inicio, cambiar_seleccion_inicio
+from partidas.albanileria import mostrar_memoria, titulo_seccion, mostrar_formulario, mostrar_resultados, mostrar_muros, mostrar_resumen, mostrar_dosificacion, control_tecnico
+from servicios.exportaciones import filas_exportacion, pasos_exportacion, exportar_excel, exportar_pdf, mostrar_exportacion, costos_exportar
+from servicios.presupuestos import cantidades_presupuesto, mostrar_costos
+from servicios.proyectos import ficha_proyecto, administrar_proyecto
+
+from servicios.autenticacion import pantalla_acceso, cerrar_sesion
+
+st.markdown("<style>" + (Path(__file__).resolve().parent / "estilos" / "estilos.css").read_text(encoding="utf-8") + "</style>", unsafe_allow_html=True)
+
+if not S.get("usuario_cubismart"):
+    pantalla_acceso()
+    st.stop()
+
+inicializar_estado()
+with st.container(key="cuenta_activa"):
+    cuenta, salir = st.columns([3,1])
+    with cuenta:
+        st.caption("Sesión activa: " + S.usuario_cubismart["nombre"])
+    with salir:
+        st.button("Cerrar sesión", on_click=cerrar_sesion, use_container_width=True, key="salir_cuenta")
+
+try:
+    db_iniciar()
+    proyectos = db_listar()
+    if 'proyecto_id' not in S:
+        S.proyecto_id = None
+except (sqlite3.Error, ValueError, OSError) as e:
+    st.error(f'No se pudo abrir la base de datos local: {e}')
+    st.stop()
 
 st.markdown("""
 <div class="hero">
     <span class="hero-tag">HERRAMIENTA DE CUBICACIÓN</span>
     <h1>🧱 CubiSmart</h1>
     <p>
-        Selecciona una partida de construcción para comenzar
-        a cubicar sus materiales de forma sencilla. 
+        Crea o abre un proyecto y cubica sus materiales de forma sencilla. 
     </p>
 </div>
 """, unsafe_allow_html=True)
 
 
-# ==========================================
-# 5. FUNCION PARA TITULOS
-# ==========================================
 
-# ==========================================
-# 6. MENU DE SELECCION DE PARTIDAS
-# ==========================================
+# Pantalla inicial: seleccionar un proyecto antes de elegir partida.
+if S.proyecto_id is None:
+    S.pop('categoria_partidas', None)
+    st.markdown('## Mis proyectos')
+    st.caption('Abre un proyecto guardado o crea uno nuevo para comenzar.')
+    if 'aviso' in S:
+        tipo, mensaje = S.pop('aviso')
+        getattr(st, tipo)(mensaje)
+    with st.container(key='inicio_proyectos'):
+        col_abrir, col_crear = st.columns(2)
+        with col_abrir:
+            with st.container(border=True):
+                st.markdown('### Abrir proyecto existente')
+                if proyectos:
+                    st.selectbox('Proyectos guardados', list(proyectos),
+                        format_func=lambda pid: proyectos[pid], index=None,
+                        placeholder='Selecciona un proyecto', key='inicio_selector_proyecto', on_change=cambiar_seleccion_inicio)
+                    st.button('Abrir proyecto', on_click=abrir_desde_inicio,
+                        use_container_width=True, disabled=S.get('inicio_selector_proyecto') is None)
+                else:
+                    st.info('Todavía no tienes proyectos guardados.')
+        with col_crear:
+            with st.container(border=True):
+                st.markdown('### Crear proyecto nuevo')
+                st.text_input('Nombre del proyecto', key='inicio_nombre_proyecto',
+                    placeholder='Ejemplo: Vivienda un piso')
+                st.button('Crear proyecto', on_click=crear_desde_inicio,
+                    use_container_width=True)
+    if S.get('inicio_selector_proyecto') in proyectos:
+        pid = S['inicio_selector_proyecto']
+        with st.expander('🗑️ Eliminar proyecto seleccionado'):
+            if S.get('confirmacion_proyecto') != pid:
+                S['confirmacion_proyecto'] = pid
+                S.pop('confirmar_borrado_proyecto', None)
+            st.warning(f'Se eliminará permanentemente el proyecto «{proyectos[pid]}» y todos sus muros y memorias de cálculo. Esta acción no se puede deshacer.')
+            st.checkbox('Confirmo que deseo eliminar este proyecto', key='confirmar_borrado_proyecto')
+            st.button('🗑️ Eliminar proyecto definitivamente', key='confirmar_eliminar_proyecto',
+                on_click=eliminar_proyecto_inicio, use_container_width=True,
+                disabled=not S.get('confirmar_borrado_proyecto', False))
+    st.caption('Los muros guardados se conservan en la base de datos local.')
+    st.stop()
+
 
 if st.session_state.partida_seleccionada is None:
 
-    st.markdown("## ¿Qué partida deseas cubicar?")
-
-    st.caption(
-        "Selecciona una tarjeta para ingresar las dimensiones."
-    )
-
-    with st.container(key="menu_partidas"):
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            if st.button(
-                "🧱 Albañilería",
-                key="partida_albanileria",
-                use_container_width=True
-            ):
-                st.session_state.partida_seleccionada = "albanileria"
-                st.rerun()
-
-        with col2:
-            st.button(
-                "🏗️ Hormigón · Próximamente",
-                key="partida_hormigon",
-                use_container_width=True,
-                disabled=True
-            )
-
-        col3, col4 = st.columns(2)
-
-        with col3:
-            st.button(
-                "🎨 Pintura · Próximamente",
-                key="partida_pintura",
-                use_container_width=True,
-                disabled=True
-            )
-
-        with col4:
-            st.button(
-                "🚰 Instalaciones · Próximamente",
-                key="partida_instalaciones",
-                use_container_width=True,
-                disabled=True
-            )
+    st.button('← Volver a mis proyectos', key='volver_proyectos_inicio', on_click=volver_proyectos, type='primary', help='Los muros guardados se conservan; los cambios sin guardar se descartan.')
+    st.caption('Proyecto activo: ' + S.proyecto_nombre)
+    if 'aviso' in S:
+        tipo, mensaje = S.pop('aviso')
+        getattr(st, tipo)(mensaje)
+    if st.button('AutoPlan · Importar y medir planos', key='abrir_autoplan', type='primary', use_container_width=True):
+        S.partida_seleccionada='autoplan'; st.rerun()
+    categoria = S.get('categoria_partidas')
+    if categoria not in CATEGORIAS:
+        st.markdown("## ¿Qué deseas cubicar?")
+        st.caption("Selecciona una categoría para consultar sus partidas.")
+        with st.container(key='menu_categorias'):
+            nombres = list(CATEGORIAS)
+            for i in range(0, len(nombres), 2):
+                columnas = st.columns(2) if i+1 < len(nombres) else [st.container()]
+                for col, nombre in zip(columnas, nombres[i:i+2]):
+                    with col:
+                        if st.button(f"{nombre} · {len(CATEGORIAS[nombre])} partidas", key=f'categoria_{i}_{nombre}', use_container_width=True):
+                            S.categoria_partidas = nombre
+                            st.rerun()
+    else:
+        if st.button('← Volver a categorías', key='volver_categorias', type='primary'):
+            S.pop('categoria_partidas', None)
+            st.rerun()
+        st.markdown('## ' + categoria)
+        st.caption('Selecciona una partida para comenzar la cubicación.')
+        with st.container(key='lista_partidas'):
+            for codigo, nombre, unidad in CATEGORIAS[categoria]:
+                disponible = codigo == '1.1' or codigo.startswith(('2.','3.','4.','5.'))
+                estado = 'Disponible' if disponible else 'Próximamente'
+                if st.button(f'{codigo} · {nombre} · {unidad} · {estado}', key='catalogo_'+codigo, disabled=not disponible, use_container_width=True):
+                    S.partida_seleccionada = 'trazado' if codigo == '1.1' else ('albanileria' if codigo == '2.9' else codigo)
+                    st.rerun()
 
     # Ocultar los calculos hasta seleccionar una partida
     st.stop()
 
 
-# BOTON PARA VOLVER AL MENU
 
-if st.button(
-    "← Volver a elegir partida",
-    key="volver_partidas"
-):
-    st.session_state.partida_seleccionada = None
-    st.session_state.resultados = resultados_vacios()
-    st.rerun()
 
-st.markdown("### 🧱 Cubicación de albañilería")
-
-def titulo_seccion(numero, nombre):
-    st.markdown(
-        f'''
-        <div class="section-heading">
-            <div class="section-number">{numero}</div>
-            <div class="section-title">{nombre}</div>
-        </div>
-        ''',
-        unsafe_allow_html=True
-    )
-
-
-# ==========================================
-# 6. DIMENSIONES DEL MURO
-# ==========================================
-
-titulo_seccion("01", "Dimensiones del muro")
-
-with st.container(border=True):
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        largo = st.number_input(
-            "Largo del muro (m)",
-            min_value=0.0,
-            value=0.0,
-            step=0.1,
-            format="%.2f"
-        )
-
-    with col2:
-        alto = st.number_input(
-            "Alto del muro (m)",
-            min_value=0.0,
-            value=0.0,
-            step=0.1,
-            format="%.2f"
-        )
-
-    st.caption(
-        "Introduce las dimensiones generales del muro en metros."
-    )
-
-
-# ==========================================
-# 7. VANOS DEL MURO
-# ==========================================
-
-titulo_seccion("02", "Vanos del muro")
-
-with st.container(border=True):
-
-    cantidad_vanos = st.number_input(
-        "Cantidad de vanos",
-        min_value=0,
-        max_value=30,
-        value=0,
-        step=1
-    )
-
-    st.caption(
-        "Considera puertas, ventanas y otras aberturas."
-    )
-
-    vanos = []
-
-    for numero in range(cantidad_vanos):
-
-        st.markdown(f"#### Vano {numero + 1}")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            ancho_vano = st.number_input(
-                f"Ancho del vano {numero + 1} (m)",
-                min_value=0.0,
-                value=0.0,
-                step=0.1,
-                format="%.2f",
-                key=f"ancho_vano_{numero}"
-            )
-
-        with col2:
-            alto_vano = st.number_input(
-                f"Alto del vano {numero + 1} (m)",
-                min_value=0.0,
-                value=0.0,
-                step=0.1,
-                format="%.2f",
-                key=f"alto_vano_{numero}"
-            )
-
-        vanos.append((ancho_vano, alto_vano))
-
-
-# ==========================================
-# 8. CARACTERISTICAS DEL LADRILLO
-# ==========================================
-
-titulo_seccion("03", "Características del ladrillo")
-
-
-with st.container(border=True):
-
-    st.markdown(
-        """
-        <div class="aviso-ladrillo">
-            Ingresa el largo y el alto de la cara visible
-            del ladrillo. El ancho corresponde al espesor
-            del muro en este modelo simplificado.
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        largo_ladrillo = st.number_input(
-            "Largo (m)",
-            min_value=0.0,
-            value=0.0,
-            step=0.01,
-            format="%.3f"
-        )
-
-    with col2:
-        alto_ladrillo = st.number_input(
-            "Alto (m)",
-            min_value=0.0,
-            value=0.0,
-            step=0.01,
-            format="%.3f"
-        )
-
-    with col3:
-        ancho_ladrillo = st.number_input(
-            "Ancho (m)",
-            min_value=0.0,
-            value=0.0,
-            step=0.01,
-            format="%.3f"
-        )
-
-    junta_mortero = st.number_input(
-        "Espesor de junta de mortero (m)",
-        min_value=0.0,
-        value=0.0,
-        step=0.005,
-        format="%.3f"
-    )
-
-    st.caption(
-        "Ejemplo: una junta de 1 cm equivale a 0.01 m."
-    )
-
-
-# ==========================================
-# 9. PORCENTAJES DE PERDIDA
-# ==========================================
-
-titulo_seccion("04", "Porcentajes de pérdida")
-
-with st.container(border=True):
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        porcentaje_perdida = st.number_input(
-            "Pérdida de ladrillos (%)",
-            min_value=0.0,
-            value=0.0,
-            step=1.0,
-            format="%.1f"
-        )
-
-    with col2:
-        porcentaje_perdida_mortero = st.number_input(
-            "Pérdida de mortero (%)",
-            min_value=0.0,
-            value=0.0,
-            step=1.0,
-            format="%.1f"
-        )
-
-    st.caption(
-        "Introduce los porcentajes de pérdida "
-        "que deseas considerar en el cálculo."
-    )
-
-
-# ==========================================
-# 10. BOTONES
-# ==========================================
-
-st.write("")
-
-col_calcular, col_limpiar = st.columns([3, 1])
-
-with col_calcular:
-    calcular = st.button(
-        "🧮 Calcular cubicación",
-        type="primary",
-        use_container_width=True
-    )
-
-with col_limpiar:
-    limpiar = st.button(
-        "Limpiar resultados",
-        key="limpiar_resultados",
-        use_container_width=True
-    )
-
-
-# ==========================================
-# 11. LIMPIAR RESULTADOS
-# ==========================================
-
-if limpiar:
-    st.session_state.resultados = resultados_vacios()
-
-
-# ==========================================
-# 12. OPERACIONES MATEMATICAS
-# ==========================================
-
-if calcular:
-
-    # VALIDAR MURO
-
-    if largo <= 0 or alto <= 0:
-        st.error(
-            "El largo y el alto del muro deben ser mayores que cero."
-        )
-        st.stop()
-
-    # VALIDAR LADRILLO
-
-    if (
-        largo_ladrillo <= 0
-        or alto_ladrillo <= 0
-        or ancho_ladrillo <= 0
-    ):
-        st.error(
-            "Todas las dimensiones del ladrillo deben ser mayores que cero."
-        )
-        st.stop()
-
-    # VALIDAR LOS VANOS
-
-    superficie_total_vanos = 0.0
-    superficies_individuales = []
-
-    for numero, (ancho_vano, alto_vano) in enumerate(vanos):
-
-        if ancho_vano <= 0 or alto_vano <= 0:
-            st.error(
-                f"Las dimensiones del vano {numero + 1} "
-                "deben ser mayores que cero."
-            )
-            st.stop()
-
-        if ancho_vano > largo or alto_vano > alto:
-            st.error(
-                f"El vano {numero + 1} supera las "
-                "dimensiones del muro."
-            )
-            st.stop()
-
-        superficie_vano = ancho_vano * alto_vano
-
-        superficie_total_vanos += superficie_vano
-
-        superficies_individuales.append(superficie_vano)
-
-    # CALCULAR SUPERFICIE DEL MURO
-
-    superficie = largo * alto
-
-    superficie_neta = superficie - superficie_total_vanos
-
-    if superficie_neta <= 0:
-        st.error(
-            "La superficie total de vanos es igual o "
-            "superior a la superficie del muro."
-        )
-        st.stop()
-
-    # CALCULAR VOLUMEN DEL MURO
-
-    espesor = ancho_ladrillo
-
-    volumen = superficie_neta * espesor
-
-    # DIMENSIONES MODULARES
-
-    largo_modular = largo_ladrillo + junta_mortero
-    alto_modular = alto_ladrillo + junta_mortero
-
-    superficie_modular = largo_modular * alto_modular
-    superficie_ladrillo = largo_ladrillo * alto_ladrillo
-
-    # CALCULAR LADRILLOS
-
-    cantidad_ladrillos = superficie_neta / superficie_modular
-
-    ladrillos_redondeados = math.ceil(
-        round(cantidad_ladrillos, 9)
-    )
-
-    cantidad_con_perdida = cantidad_ladrillos * (
-        1 + porcentaje_perdida / 100
-    )
-
-    ladrillos_finales = math.ceil(
-        round(cantidad_con_perdida, 9)
-    )
-
-    # CALCULAR MORTERO
-
-    volumen_ladrillo = (
-        largo_ladrillo
-        * alto_ladrillo
-        * ancho_ladrillo
-    )
-
-    volumen_modular = (
-        largo_modular
-        * alto_modular
-        * ancho_ladrillo
-    )
-
-    mortero_por_modulo = volumen_modular - volumen_ladrillo
-
-    mortero_total = mortero_por_modulo * cantidad_ladrillos
-
-    mortero_final = mortero_total * (
-        1 + porcentaje_perdida_mortero / 100
-    )
-
-    # GUARDAR RESULTADOS EN LA SESION
-
-   
-    st.session_state.resultados = {
-        "superficie": superficie,
-        "superficie_vanos": superficie_total_vanos,
-        "superficie_neta": superficie_neta,
-        "volumen": volumen,
-        "ladrillos": ladrillos_redondeados,
-        "ladrillos_finales": ladrillos_finales,
-        "mortero": mortero_total,
-        "mortero_final": mortero_final,
-        "superficie_modular": superficie_modular,
-        "detalle_vanos": superficies_individuales,
-
-        # DATOS PARA LA MEMORIA DE CALCULO
-        "memoria": {
-            "largo": largo,
-            "alto": alto,
-            "espesor": espesor,
-            "vanos": vanos.copy(),
-            "largo_ladrillo": largo_ladrillo,
-            "alto_ladrillo": alto_ladrillo,
-            "ancho_ladrillo": ancho_ladrillo,
-            "junta_mortero": junta_mortero,
-            "largo_modular": largo_modular,
-            "alto_modular": alto_modular,
-            "cantidad_ladrillos": cantidad_ladrillos,
-            "cantidad_con_perdida": cantidad_con_perdida,
-            "porcentaje_perdida": porcentaje_perdida,
-            "porcentaje_perdida_mortero": porcentaje_perdida_mortero,
-            "volumen_ladrillo": volumen_ladrillo,
-            "volumen_modular": volumen_modular,
-            "mortero_por_modulo": mortero_por_modulo
-        }
-    }
-
-
-    st.success("¡Cubicación calculada correctamente!")
-
-
-# ==========================================
-# 13. RESULTADOS SIEMPRE VISIBLES
-# ==========================================
-
-r = st.session_state.resultados
-
-st.divider()
-
-st.markdown("## 📊 Resultados de cubicación")
-
-# SUPERFICIES
-
-st.markdown("### 📐 Superficies del muro")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.metric(
-        "Superficie total",
-        f"{r['superficie']:.2f} m²"
-    )
-
-    st.metric(
-        "Superficie de vanos",
-        f"{r['superficie_vanos']:.2f} m²"
-    )
-
-with col2:
-    st.metric(
-        "Superficie neta",
-        f"{r['superficie_neta']:.2f} m²"
-    )
-
-    st.metric(
-        "Volumen del muro",
-        f"{r['volumen']:.3f} m³"
-    )
-
-
-# DETALLE DE VANOS
-
-if r["detalle_vanos"]:
-
-    with st.expander("Ver detalle de vanos"):
-
-        for numero, superficie_vano in enumerate(
-            r["detalle_vanos"]
-        ):
-            st.write(
-                f"Vano {numero + 1}: "
-                f"{superficie_vano:.2f} m²"
-            )
-
-
-# RESULTADOS DE LADRILLOS
-
-st.divider()
-
-st.markdown("### 🧱 Cantidad de ladrillos")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.metric(
-        "Cantidad teórica",
-        f"{r['ladrillos']} unidades"
-    )
-
-with col2:
-    st.metric(
-        "Cantidad con pérdidas",
-        f"{r['ladrillos_finales']} unidades"
-    )
-
-st.caption(
-    f"Superficie modular del ladrillo: "
-    f"{r['superficie_modular']:.4f} m²"
-)
-
-
-# RESULTADOS DE MORTERO
-
-st.divider()
-
-st.markdown("### 🪣 Mortero de pega")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.metric(
-        "Mortero teórico",
-        f"{r['mortero']:.4f} m³"
-    )
-
-with col2:
-    st.metric(
-        "Mortero con pérdidas",
-        f"{r['mortero_final']:.4f} m³"
-    )
-
-st.caption(
-    f"Volumen equivalente con pérdidas: "
-    f"{r['mortero_final'] * 1000:.2f} litros"
-)
-
-
-
-# ==========================================
-# 14. PIE DE PAGINA
-# ==========================================
-
-st.markdown("""
-<div class="footer">
-    CubiSmart · Prototipo de cubicación de albañilería<br>
-    Desarrollado con Python y Streamlit
-</div>
-""", unsafe_allow_html=True)
-
+if S.partida_seleccionada == 'autoplan':
+    from autoplan.interfaz import mostrar
+    mostrar()
+    st.stop()
+
+from partidas.calculos_terminaciones_instalaciones import CAT as CATALOGO_TI
+if S.partida_seleccionada in CATALOGO_TI:
+    from partidas.terminaciones_instalaciones import mostrar
+    mostrar(S.partida_seleccionada)
+    st.stop()
+
+from partidas.calculos_techumbre import CAT as CATALOGO_TECHUMBRE
+if S.partida_seleccionada in CATALOGO_TECHUMBRE:
+    from partidas.techumbre import mostrar
+    mostrar(S.partida_seleccionada)
+    st.stop()
+
+from partidas.calculos_obra_gruesa import CAT as CATALOGO_OBRA_GRUESA
+if S.partida_seleccionada in CATALOGO_OBRA_GRUESA:
+    from partidas.obra_gruesa import mostrar
+    mostrar(S.partida_seleccionada)
+    st.stop()
+
+if S.partida_seleccionada == 'trazado':
+    from partidas.trazado import mostrar_trazado
+    mostrar_trazado()
+    st.stop()
+
+
+with st.sidebar:
+    st.markdown('## 🧱 CubiSmart')
+    if st.button('← Volver a elegir partida',key='volver_partidas',use_container_width=True):
+        S.partida_seleccionada=None; st.rerun()
+    st.button('📁 Volver a mis proyectos', key='volver_proyectos_lateral', on_click=volver_proyectos, type='primary', use_container_width=True, help='Guarda los cambios antes de volver. Los borradores se descartan.')
+    st.markdown('### 📁 Proyectos')
+    proyectos = db_listar()
+    if 'selector_proyecto' not in S:
+        S['selector_proyecto'] = S.proyecto_id
+    st.selectbox('Proyecto activo', list(proyectos), format_func=lambda pid: proyectos[pid], key='selector_proyecto', on_change=cambiar_proyecto)
+    with st.expander('＋ Crear proyecto'):
+        st.text_input('Nombre del proyecto', key='nuevo_nombre_proyecto')
+        st.button('Crear y abrir', on_click=crear_proyecto, use_container_width=True)
+    st.caption('Los muros guardados se conservan en disco. Guarda los cambios antes de cambiar de proyecto.')
+    st.markdown('### Navegación')
+    vista=st.radio('Vista',['🧮 Cubicación','📋 Memoria de cálculo','📁 Muros guardados','📊 Resumen general','🪣 Dosificación de mortero','📄 Exportar','💰 Presupuesto','🧮 APU','📋 Ficha del proyecto','⚙️ Administración','✅ Control técnico'],key='vista_actual',label_visibility='collapsed', format_func=lambda opcion: '▸ ' + opcion.split(' ', 1)[1])
+    st.divider()
+    st.markdown('### Gestión de muros')
+    st.text_input('Nombre del muro',key='dato_nombre_muro')
+    if S.muro_en_edicion: st.caption('Editando: '+S.muro_en_edicion)
+    st.button('➕ Nuevo muro',key='nuevo_muro',on_click=nuevo_muro,use_container_width=True)
+    if S.muros_guardados:
+        st.selectbox('Muros guardados',list(S.muros_guardados),index=None,placeholder='Selecciona un muro',key='seleccionar_muro_guardado',on_change=cargar_muro,args=(False,))
+        st.button('✏️ Cargar muro',key='editar_muro',on_click=cargar_muro,use_container_width=True)
+        st.button('🗑️ Eliminar muro',key='eliminar_muro',on_click=eliminar_muro,use_container_width=True)
+    else: st.caption('No hay muros guardados.')
+    st.divider()
+    st.markdown('### Operaciones')
+    st.button('🧪 Cargar datos de prueba',on_click=cargar_datos_prueba,use_container_width=True)
+    st.button('🔄 Restablecer formulario',on_click=nuevo_muro,use_container_width=True)
+    st.button('🧮 Calcular cubicación',on_click=calcular,use_container_width=True)
+    st.button('💾 Guardar muro',on_click=guardar_muro,use_container_width=True)
+    st.button('🧮 Calcular y guardar muro',on_click=calcular,args=(True,),type='primary',use_container_width=True)
+    st.button('Limpiar resultados',on_click=limpiar_resultados,use_container_width=True)
+    if 'aviso' in S:
+        tipo,mensaje=S.pop('aviso'); getattr(st,tipo)(mensaje)
+    st.caption('Guardado local automático al guardar o eliminar un muro. Los borradores y ajustes de dosificación no se guardan.')
+
+if vista=='🧮 Cubicación':
+    st.markdown('### 🧱 Cubicación de albañilería')
+    st.caption('Proyecto activo: '+S.proyecto_nombre)
+    st.caption('Trabajando en: '+S.dato_nombre_muro)
+    mostrar_formulario()
+    if S.resultados.get('memoria') and S.resultados.get('datos')!=datos_actuales():
+        st.warning('Has cambiado datos. Los resultados corresponden a la última cubicación; vuelve a calcular.')
+    mostrar_resultados()
+elif vista=='📋 Memoria de cálculo':
+    if S.resultados.get('datos') and S.resultados['datos']!=datos_actuales(): st.warning('Memoria de la última cubicación, no de los datos modificados.')
+    mostrar_memoria()
+elif vista=='📁 Muros guardados': mostrar_muros()
+elif vista=='📊 Resumen general': mostrar_resumen()
+elif vista=='📄 Exportar': mostrar_exportacion()
+elif vista=='💰 Presupuesto':
+    with st.container(key='vista_costos'):
+        mostrar_costos()
+elif vista=='🧮 APU':
+    with st.container(key='vista_costos'):
+        mostrar_costos(True)
+elif vista=='📋 Ficha del proyecto':
+    with st.container(key='vista_ficha'):
+        ficha_proyecto()
+elif vista=='⚙️ Administración':
+    with st.container(key='vista_admin'):
+        administrar_proyecto()
+elif vista=='✅ Control técnico': control_tecnico()
+else:
+    if S.resultados.get('datos') and S.resultados['datos']!=datos_actuales(): st.warning('Dosificación basada en la última cubicación; vuelve a calcular si cambiaste datos.')
+    mostrar_dosificacion()
+st.markdown('<div class="footer">CubiSmart · Cubicación de albañilería</div>',unsafe_allow_html=True)

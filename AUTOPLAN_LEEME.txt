@@ -1,0 +1,9 @@
+CubiSmart V4.0 — AutoPlan experimental
+Instalar: py -m pip install -r requirements.txt
+Ejecutar: py -m streamlit run app.py --server.port 8502
+Conservar bases de datos y datos_usuarios. Abrir proyecto y seleccionar AutoPlan.
+DXF: confirmar unidades. PDF vectorial: seleccionar página y línea de referencia, introducir longitud real. DWG: requiere ODA File Converter instalado (o exportar DXF desde AutoCAD).
+Se leen LINE, LWPOLYLINE rectas y bloques simples de modelspace; PDF: segmentos y rectángulos vectoriales. No se leen bloques anidados, curvas, cotas semánticas, imágenes escaneadas ni BIM. La vista no es un render CAD completo.
+Filtrar capas, confirmar escala y clasificación, seleccionar entidades y destino. No se deducen espesores, alturas, materiales ni precios. Solo se transfieren rectángulos a trazado, cielo y cerámica; líneas a guardapolvos, cornisas y redes; bloques simples a puntos eléctricos y artefactos. Comprobar que no hay solapes o duplicados y que las longitudes de redes son reales, no solo proyectadas. No importar una página PDF con múltiples escalas como una sola medición.
+Se omite reimportar el mismo ID de entidad, archivo, página y partida. Para corregir escala, eliminar registros erróneos de la partida y volver a importar. No se detectan duplicados entre archivos diferentes.
+Pruebas sintéticas DXF/PDF: rectángulo 12 x 8 m = 96 m², línea 12 m, bloque = 1 unidad. No se probó Streamlit ni conversión DWG real.
