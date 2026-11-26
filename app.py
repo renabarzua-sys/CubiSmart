@@ -810,6 +810,7 @@ if calcular:
 
     # GUARDAR RESULTADOS EN LA SESION
 
+   
     st.session_state.resultados = {
         "superficie": superficie,
         "superficie_vanos": superficie_total_vanos,
@@ -820,8 +821,30 @@ if calcular:
         "mortero": mortero_total,
         "mortero_final": mortero_final,
         "superficie_modular": superficie_modular,
-        "detalle_vanos": superficies_individuales
+        "detalle_vanos": superficies_individuales,
+
+        # DATOS PARA LA MEMORIA DE CALCULO
+        "memoria": {
+            "largo": largo,
+            "alto": alto,
+            "espesor": espesor,
+            "vanos": vanos.copy(),
+            "largo_ladrillo": largo_ladrillo,
+            "alto_ladrillo": alto_ladrillo,
+            "ancho_ladrillo": ancho_ladrillo,
+            "junta_mortero": junta_mortero,
+            "largo_modular": largo_modular,
+            "alto_modular": alto_modular,
+            "cantidad_ladrillos": cantidad_ladrillos,
+            "cantidad_con_perdida": cantidad_con_perdida,
+            "porcentaje_perdida": porcentaje_perdida,
+            "porcentaje_perdida_mortero": porcentaje_perdida_mortero,
+            "volumen_ladrillo": volumen_ladrillo,
+            "volumen_modular": volumen_modular,
+            "mortero_por_modulo": mortero_por_modulo
+        }
     }
+
 
     st.success("¡Cubicación calculada correctamente!")
 
